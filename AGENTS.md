@@ -1,27 +1,26 @@
-# CardVault — AI Agent Context
+# RKIES BRND — AI Agent Context
 
 ## What This Is
-CardVault is a **P2P sports card marketplace** built on Medusa.js v2 + Next.js 16.
+RKIES BRND is a **P2P sports card marketplace** (formerly CardVault) built on Medusa.js v2 + Next.js 16.
 Monorepo at `/home/alex/projects/cardstore/cardvault/`.
+
+## Brand
+- **Name:** RKIES BRND (changed from CardVault)
+- **Logo:** Sparkle icon in cyan bg + "RKIES" in cyan + " BRND" in white
+- **Theme:** Dark (#0a0a0a), cyan accent (#00e5ff), Geist fonts
 
 ## Quick Start
 ```bash
 # PostgreSQL (Docker)
 docker start cardvault-postgres
-
+# Redis (Docker)
+docker start cardvault-redis
 # Backend
-cd /home/alex/projects/cardstore/cardvault/backend
-npx medusa develop          # :9000
-
+cd /home/alex/projects/cardstore/cardvault/backend && npx medusa develop
 # Storefront
-cd /home/alex/projects/cardstore/cardvault/storefront
-pnpm dev                    # :3000
-
-# Build check
-cd /home/alex/projects/cardstore/cardvault/storefront && pnpm build
-
-# Admin panel
-http://localhost:9000/app   # admin@cardvault.com / AdminPassword123!
+cd /home/alex/projects/cardstore/cardvault/storefront && pnpm dev
+# Admin
+http://localhost:9000/app  (admin@cardvault.com / AdminPassword123!)
 ```
 
 ## Tech Stack
@@ -32,40 +31,45 @@ http://localhost:9000/app   # admin@cardvault.com / AdminPassword123!
 | UI | shadcn/ui v4 (@base-ui/react, NOT Radix) |
 | Styling | Tailwind CSS v4 (@theme inline in globals.css) |
 | DB | PostgreSQL 16 (Docker, port 5432) |
-| Payments | Stripe (plugin configured, keys needed) |
+| Cache | Redis 7 Alpine (Docker, port 6379) |
+| Payments | Stripe (plugin configured) |
 | Fonts | Geist Sans + Geist Mono (next/font/google) |
 | Package mgr | pnpm v11 |
 
 ## Key Files
-- `backend/medusa-config.ts` — module registration (seller, file, payment)
+- `backend/medusa-config.ts` — module registration with Redis (cache + event-bus + workflow-engine)
 - `backend/src/modules/seller/` — custom seller module (MikroORM model)
 - `backend/src/api/` — custom API routes (store & admin)
 - `backend/src/admin/routes/sellers/page.tsx` — admin seller management
-- `storefront/src/app/layout.tsx` — root layout with navbar/footer
-- `storefront/src/app/globals.css` — design system colors & theme
+- `storefront/src/app/layout.tsx` — root layout with TooltipProvider
+- `storefront/src/components/navbar.tsx` — nav with Tooltip hover, search, cart
+- `storefront/src/components/footer.tsx` — brand footer
 - `storefront/src/lib/medusa.ts` — Medusa JS SDK client
+- `deploy/nginx/` — nginx configs
+- `deploy/scripts/` — deployment and SSL scripts
+- `deploy/docker-compose.prod.yml` — production DB + Redis
 
 ## Gotchas / Breaking Changes
 1. **shadcn Button has no `asChild`** — use `buttonVariants({...})` on `<Link>` directly
 2. **No tailwind.config.ts** — colors defined via CSS vars + `@theme inline` in globals.css
 3. **shadcn Accordion uses @base-ui** — no `type` or `collapsible` props
-4. **Medusa v2 uses MikroORM**, not TypeORM — models use `model.define()`
-5. **pnpm build scripts** need approval: `pnpm approve-builds sharp unrs-resolver`
-6. **Storefront .env.local**: `NEXT_PUBLIC_MEDUSA_URL=http://localhost:9000`
-7. **Backend uses fake Redis** in dev — warnings are expected
-8. **Node memory**: set `NODE_OPTIONS="--max-old-space-size=4096"` for Medusa CLI
+4. **shadcn HoverCard uses @base-ui/preview-card** — no `openDelay`, no `asChild`
+5. **TooltipTrigger has no `asChild`** — just wrap children directly
+6. **Medusa v2 uses MikroORM**, not TypeORM — models use `model.define()`
+7. **pnpm build scripts** need approval: `pnpm approve-builds`
+8. **Backend uses Redis** for cache, event-bus, workflow-engine
+9. **Seed script**: `cd backend && npx ts-node --swc src/scripts/seed-products.ts`
+10. **Lucide v1.17**: `Fire`, `Flame`, `Grid3X3` don't exist — use `Zap`, `Grid2X2` instead
 
 ## GitHub
-- Repo: https://github.com/CNVCTION/cardvault
+- Repo: https://github.com/CNVICTION/cardvault
 - Branch: main
-- Local remote: `origin` → `https://github.com/CNVCTION/cardvault.git`
 
 ## Images
-- `/home/alex/projects/cardstore/img/cards/` — sample card images (card_001-005.jpg)
+- `/home/alex/projects/cardstore/img/cards/` — 5 sample card images
 - `/home/alex/projects/cardstore/img/brand/` — company logos and branding assets
+- Products use pollinations.ai remote URLs for filler card images
 
-## What's NOT Done (needs user)
-- Real Stripe API keys in `backend/.env`
-- Redis instance for production
-- Actual product/card data seeded
-- VPS deployment (nginx, SSL, PM2)
+## MCP Servers Installed
+- `pollinations-mcp` — free image generation (rate-limited on this IP)
+- `gemini-bridge-mcp` — Nano Banana + Veo via Gemini Web (needs login)
