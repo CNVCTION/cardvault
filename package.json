@@ -1,0 +1,10 @@
+{
+  "name": "cardvault",
+  "private": true,
+  "scripts": {
+    "dev:backend": "pnpm --filter @cardvault/backend dev",
+    "dev:storefront": "pnpm --filter storefront dev",
+    "dev": "pnpm dev:backend & pnpm dev:storefront",
+    "build": "pnpm -r build"
+  }
+}
