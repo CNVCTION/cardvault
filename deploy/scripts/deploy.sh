@@ -29,7 +29,12 @@ fi
 # Install dependencies
 echo ""
 echo "Installing dependencies..."
-pnpm install --frozen-lockfile
+if [ -f "$DEPLOY_DIR/pnpm-lock.yaml" ]; then
+    pnpm install --frozen-lockfile
+else
+    echo "No lockfile found, running fresh install..."
+    pnpm install
+fi
 
 # Build backend
 echo ""
