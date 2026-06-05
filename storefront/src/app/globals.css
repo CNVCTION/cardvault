@@ -36,3 +36,9 @@ body {
 
 * { border-color: var(--border); }
 ::selection { background: var(--accent); color: #000; }
+
+@keyframes slide-in-from-top-2 {
+  from { transform: translateY(-0.5rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-in { animation: slide-in-from-top-2 0.15s ease-out; }
